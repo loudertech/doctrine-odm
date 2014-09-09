@@ -2,7 +2,10 @@ PHP_ARG_ENABLE(doctrine, whether to enable doctrine, [ --enable-doctrine   Enabl
 
 if test "$PHP_DOCTRINE" = "yes"; then
 	AC_DEFINE(HAVE_DOCTRINE, 1, [Whether you have Doctrine])
-	doctrine_sources="doctrine.c kernel/main.c kernel/memory.c kernel/exception.c kernel/hash.c kernel/debug.c kernel/backtrace.c kernel/object.c kernel/array.c kernel/extended/array.c kernel/string.c kernel/fcall.c kernel/require.c kernel/file.c kernel/operators.c kernel/concat.c kernel/variables.c kernel/filter.c kernel/iterator.c kernel/exit.c doctrine/odm/mongodb/documentmanager.zep.c
+	doctrine_sources="doctrine.c kernel/main.c kernel/memory.c kernel/exception.c kernel/hash.c kernel/debug.c kernel/backtrace.c kernel/object.c kernel/array.c kernel/extended/array.c kernel/string.c kernel/fcall.c kernel/require.c kernel/file.c kernel/operators.c kernel/concat.c kernel/variables.c kernel/filter.c kernel/iterator.c kernel/exit.c doctrine/mongodb/cursor.zep.c
+	doctrine/mongodb/iterator.zep.c
+	doctrine/odm/mongodb/cursor.zep.c
+	doctrine/odm/mongodb/documentmanager.zep.c
 	doctrine/odm/mongodb/events.zep.c
 	doctrine/odm/mongodb/hydrator/hydratorfactory.zep.c
 	doctrine/odm/mongodb/lockmode.zep.c

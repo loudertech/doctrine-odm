@@ -4,6 +4,9 @@
 #ifndef ZEPHIR_CLASS_ENTRIES_H
 #define ZEPHIR_CLASS_ENTRIES_H
 
+#include "doctrine/mongodb/cursor.zep.h"
+#include "doctrine/mongodb/iterator.zep.h"
+#include "doctrine/odm/mongodb/cursor.zep.h"
 #include "doctrine/odm/mongodb/documentmanager.zep.h"
 #include "doctrine/odm/mongodb/events.zep.h"
 #include "doctrine/odm/mongodb/hydrator/hydratorfactory.zep.h"

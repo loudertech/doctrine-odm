@@ -24,6 +24,9 @@
 #include "kernel/fcall.h"
 #include "kernel/memory.h"
 
+zend_class_entry *doctrine_mongodb_iterator_ce;
+zend_class_entry *doctrine_mongodb_cursor_ce;
+zend_class_entry *doctrine_odm_mongodb_cursor_ce;
 zend_class_entry *doctrine_odm_mongodb_documentmanager_ce;
 zend_class_entry *doctrine_odm_mongodb_events_ce;
 zend_class_entry *doctrine_odm_mongodb_hydrator_hydratorfactory_ce;
@@ -194,6 +197,9 @@ static PHP_MINIT_FUNCTION(doctrine)
 	setlocale(LC_ALL, "C");
 #endif
 
+	ZEPHIR_INIT(Doctrine_MongoDB_Iterator);
+	ZEPHIR_INIT(Doctrine_MongoDB_Cursor);
+	ZEPHIR_INIT(Doctrine_ODM_MongoDB_Cursor);
 	ZEPHIR_INIT(Doctrine_ODM_MongoDB_DocumentManager);
 	ZEPHIR_INIT(Doctrine_ODM_MongoDB_Events);
 	ZEPHIR_INIT(Doctrine_ODM_MongoDB_Hydrator_HydratorFactory);

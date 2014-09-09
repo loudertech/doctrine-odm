@@ -47,21 +47,21 @@ class CollectionPersister
      *
      * @var DocumentManager
      */
-    private $dm;
+    private dm;
 
     /**
      * The PersistenceBuilder instance.
      *
      * @var PersistenceBuilder
      */
-    private $pb;
+    private pb;
 
     /**
      * The PersistenceBuilder instance.
      *
      * @var PersistenceBuilder
      */
-    private $uow;
+    private uow;
 
     /**
      * Constructs a new CollectionPersister instance.
@@ -81,7 +81,7 @@ class CollectionPersister
      * @param PersistentCollection $coll
      * @param array $options
      */
-    public function delete(coll, options)
+    public final function delete(coll, options)
     {
         var mapping, pathParent, propertyPath, parentValue;
 
@@ -102,7 +102,7 @@ class CollectionPersister
      * @param PersistentCollection $coll
      * @param array $options
      */
-    public function update(coll, options)
+    public final function update(coll, options)
     {
         var mapping;
 
@@ -161,7 +161,7 @@ class CollectionPersister
 
         $this->executeQuery($parent, $query, $options);*/
 
-        throw new Exception("?");
+        throw new \Exception("?");
     }
 
     /**
@@ -238,7 +238,7 @@ class CollectionPersister
 
         $this->executeQuery($parent, $query, $options);*/
 
-        throw new Exception("?");
+        throw new \Exception("?");
     }
 
     /**
