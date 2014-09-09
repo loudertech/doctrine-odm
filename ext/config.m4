@@ -5,7 +5,8 @@ if test "$PHP_DOCTRINE" = "yes"; then
 	doctrine_sources="doctrine.c kernel/main.c kernel/memory.c kernel/exception.c kernel/hash.c kernel/debug.c kernel/backtrace.c kernel/object.c kernel/array.c kernel/extended/array.c kernel/string.c kernel/fcall.c kernel/require.c kernel/file.c kernel/operators.c kernel/concat.c kernel/variables.c kernel/filter.c kernel/iterator.c kernel/exit.c doctrine/odm/mongodb/documentmanager.zep.c
 	doctrine/odm/mongodb/events.zep.c
 	doctrine/odm/mongodb/hydrator/hydratorfactory.zep.c
-	doctrine/odm/mongodb/lockmode.zep.c "
+	doctrine/odm/mongodb/lockmode.zep.c
+	doctrine/odm/mongodb/persisters/collectionpersister.zep.c "
 	PHP_NEW_EXTENSION(doctrine, $doctrine_sources, $ext_shared)
 
 	old_CPPFLAGS=$CPPFLAGS

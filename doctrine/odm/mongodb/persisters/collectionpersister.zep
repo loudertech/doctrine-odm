@@ -104,6 +104,8 @@ class CollectionPersister
      */
     public function update(coll, options)
     {
+        var mapping;
+
         let mapping = coll->getMapping();
 
         if mapping["isInverseSide"] {
@@ -123,7 +125,7 @@ class CollectionPersister
                 break;
 
             default:
-                throw new \UnexpectedValueException('Unsupported collection strategy: ' . mapping['strategy']);
+                throw new \UnexpectedValueException("Unsupported collection strategy: " . mapping["strategy"]);
         }
     }
 
@@ -138,7 +140,7 @@ class CollectionPersister
      * @param PersistentCollection $coll
      * @param array $options
      */
-    private function ysetCollection(coll, array $options)
+    private function setCollection(coll, array $options)
     {
         /*$mapping = $coll->getMapping();
         list($propertyPath, $parent) = $this->getPathAndParent($coll);
@@ -158,6 +160,8 @@ class CollectionPersister
         $query = array('$set' => array($propertyPath => $setData));
 
         $this->executeQuery($parent, $query, $options);*/
+
+        throw new Exception("?");
     }
 
     /**
@@ -171,7 +175,7 @@ class CollectionPersister
      */
     private function deleteElements(coll, options)
     {
-        var pathParent, deleteDiff, propertyPath, key, document, query;
+        var pathParent, deleteDiff, propertyPath, key, document, query, parentValue;
 
         let deleteDiff = coll->getDeleteDiff();
 
@@ -187,7 +191,7 @@ class CollectionPersister
             let query["$unset"][propertyPath . "." . key] = true;
         }
 
-        $this->executeQuery(parent, query, options);
+        $this->executeQuery(parentValue, query, options);
 
         /**
          * @todo This is a hack right now because we don't have a proper way to
@@ -195,7 +199,7 @@ class CollectionPersister
          * in the element being left in the array as null so we have to pull
          * null values.
          */
-        this->executeQuery(parent, ["$pull": [propertyPath: null]], options);
+        this->executeQuery(parentValue, ["$pull": [propertyPath: null]], options);
     }
 
     /**
@@ -207,7 +211,7 @@ class CollectionPersister
      * @param PersistentCollection $coll
      * @param array $options
      */
-    private function xinsertElements(coll, array $options)
+    private function insertElements(coll, array $options)
     {
         /*$insertDiff = $coll->getInsertDiff();
 
@@ -233,6 +237,8 @@ class CollectionPersister
         $query = array('$' . $mapping['strategy'] => array($propertyPath => $value));
 
         $this->executeQuery($parent, $query, $options);*/
+
+        throw new Exception("?");
     }
 
     /**
@@ -263,32 +269,35 @@ class CollectionPersister
      */
     private function getPathAndParent(coll)
     {
-        var mapping, fields, uow;
+        var mapping, fields, uow, association, propertyPath, path, m,
+            owner, field, parentValue;
 
-        let mapping = $coll->getMapping();
+        let mapping = coll->getMapping();
 
         let fields = [];
         let parentValue = coll->getOwner(), uow = this->uow;
         loop {
-            let association = ->getParentAssociation(parent);
+
+            let association = uow->getParentAssociation(parentValue);
             if association === null {
                 break;
             }
-        }
-        while (null !== ) {
-            list($m, $owner, $field) = $association;
-            if (isset($m['reference'])) {
+
+            let m = association[0], owner = association[1], field = association[2];
+
+            if isset m["reference"] {
                 break;
             }
-            $parent = $owner;
-            $fields[] = $field;
+
+            let parentValue = owner, fields[] = field;
         }
-        $propertyPath = implode('.', array_reverse($fields));
-        $path = $mapping['name'];
-        if ($propertyPath) {
-            $path = $propertyPath . '.' . $path;
+
+        let propertyPath = implode(".", array_reverse(fields));
+        let path = mapping["name"];
+        if propertyPath {
+            let path = propertyPath . "." . path;
         }
-        return array($path, $parent);*/
+        return [path, parentValue];
     }
 
     /**
@@ -300,6 +309,8 @@ class CollectionPersister
      */
     private function executeQuery(document, array query, array options)
     {
+        var className, classInstance, id, collection;
+
         let className = get_class(document);
         let classInstance = this->dm->getClassMetadata(className);
         let id = classInstance->getDatabaseIdentifierValue(this->uow->getDocumentIdentifier(document));
