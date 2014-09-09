@@ -202,13 +202,15 @@ class DocumentRepository implements ObjectRepository, Selectable
      */
     public function __call(method, arguments)
     {
-        if substr(method, 0, 6) == 'findBy' {
+        var by, fieldName, var1;
+
+        if substr(method, 0, 6) == "findBy" {
             let by = substr(method, 6, strlen(method));
-            let method = 'findBy';
+            let method = "findBy";
         } else {
-            if substr(method, 0, 9) == 'findOneBy' {
+            if substr(method, 0, 9) == "findOneBy" {
                 let by = substr(method, 9, strlen(method));
-                let method = 'findOneBy';
+                let method = "findOneBy";
             } else {
                 throw new \BadMethodCallException(
                     "Undefined method 'method'. The method name must start with " .
@@ -221,10 +223,11 @@ class DocumentRepository implements ObjectRepository, Selectable
             throw MongoDBException::findByRequiresParameter(method . by);
         }
 
-        let fieldName = lcfirst(\Doctrine\Common\Util\Inflector::classify(by));
+        let var1 = "\\Doctrine\\Common\\Util\\Inflector";
+        let fieldName = lcfirst({var1}::classify(by));
 
         if this->classMetada->hasField(fieldName) {
-            return this->method([fieldName: arguments[0]]);
+            return this->{method}([fieldName: arguments[0]]);
         } else {
             throw MongoDBException::invalidFindByCall(this->documentName, fieldName, method . by);
         }
@@ -272,6 +275,8 @@ class DocumentRepository implements ObjectRepository, Selectable
      */
     public function matching(criteria)
     {
+        var visitor, expr, queryBuilder;
+
         let visitor = new QueryExpressionVisitor(this->createQueryBuilder());
         let expr = visitor->dispatch(criteria->getWhereExpression());
         let queryBuilder = this->createQueryBuilder()->setQueryArray(expr->getQuery());
