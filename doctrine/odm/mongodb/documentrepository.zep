@@ -25,6 +25,7 @@ use Doctrine\Common\Collections\Selectable;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ODM\MongoDB\Mapping\MappingException;
 use Doctrine\ODM\MongoDB\Query\QueryExpressionVisitor;
+use Doctrine\ODM\MongoDB\LockException;
 
 /**
  * A DocumentRepository serves as a repository for documents with generic as well as
@@ -104,6 +105,8 @@ class DocumentRepository implements ObjectRepository, Selectable
      */
     public function find(id, lockMode = LockMode::NONE, lockVersion = null)
     {
+        var identifierFieldNames, identifierFieldName, document, criteria;
+
         if id === null {
             return;
         }
