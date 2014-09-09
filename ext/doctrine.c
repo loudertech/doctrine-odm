@@ -28,6 +28,7 @@ zend_class_entry *doctrine_odm_mongodb_documentmanager_ce;
 zend_class_entry *doctrine_odm_mongodb_events_ce;
 zend_class_entry *doctrine_odm_mongodb_hydrator_hydratorfactory_ce;
 zend_class_entry *doctrine_odm_mongodb_lockmode_ce;
+zend_class_entry *doctrine_odm_mongodb_persisters_collectionpersister_ce;
 
 ZEND_DECLARE_MODULE_GLOBALS(doctrine)
 
@@ -197,6 +198,7 @@ static PHP_MINIT_FUNCTION(doctrine)
 	ZEPHIR_INIT(Doctrine_ODM_MongoDB_Events);
 	ZEPHIR_INIT(Doctrine_ODM_MongoDB_Hydrator_HydratorFactory);
 	ZEPHIR_INIT(Doctrine_ODM_MongoDB_LockMode);
+	ZEPHIR_INIT(Doctrine_ODM_MongoDB_Persisters_CollectionPersister);
 
 #if PHP_VERSION_ID < 50500
 	setlocale(LC_ALL, old_lc_all);

@@ -8,5 +8,6 @@
 #include "doctrine/odm/mongodb/events.zep.h"
 #include "doctrine/odm/mongodb/hydrator/hydratorfactory.zep.h"
 #include "doctrine/odm/mongodb/lockmode.zep.h"
+#include "doctrine/odm/mongodb/persisters/collectionpersister.zep.h"
 
 #endif
