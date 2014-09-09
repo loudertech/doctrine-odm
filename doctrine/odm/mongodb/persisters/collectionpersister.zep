@@ -113,6 +113,7 @@ class CollectionPersister
         }
 
         switch mapping["strategy"] {
+
             case "set":
             case "setArray":
                 this->setCollection(coll, options);
