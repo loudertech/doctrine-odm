@@ -1,5 +1,7 @@
-*.zep.c
-*.zep.h
+ext/doctrine/
+ext/doctrine/*.zep.c
+ext/doctrine/*.zep.h
+*.loT
 *.lo
 *.o
 .temp/

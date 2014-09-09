@@ -42,7 +42,7 @@ class ClassUtils
         var pos;
 
         let pos = strrpos(className, "\\" . Proxy::MARKER . "\\");
-        if false === pos {
+        if pos === false {
             return className;
         }
 
