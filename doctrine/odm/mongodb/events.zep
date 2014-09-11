@@ -39,7 +39,7 @@ final class Events
      *
      * @var string
      */
-    const preRemove = "preRemove";
+    const PREREMOVE = "preRemove";
 
     /**
      * The postRemove event occurs for a document after the document has
@@ -49,7 +49,7 @@ final class Events
      *
      * @var string
      */
-    const postRemove = "postRemove";
+    const POSTREMOVE = "postRemove";
 
     /**
      * The prePersist event occurs for a given document before the respective
@@ -59,7 +59,7 @@ final class Events
      *
      * @var string
      */
-    const prePersist = "prePersist";
+    const PREPERSIST = "prePersist";
 
     /**
      * The postPersist event occurs for a document after the document has
@@ -70,7 +70,7 @@ final class Events
      *
      * @var string
      */
-    const postPersist = "postPersist";
+    const POSTPERSIST = "postPersist";
 
     /**
      * The preUpdate event occurs before the database update operations to
@@ -80,7 +80,7 @@ final class Events
      *
      * @var string
      */
-    const preUpdate = "preUpdate";
+    const PREUPDATE = "preUpdate";
 
     /**
      * The postUpdate event occurs after the database update operations to
@@ -90,7 +90,7 @@ final class Events
      *
      * @var string
      */
-    const postUpdate = "postUpdate";
+    const POSTUPDATE = "postUpdate";
 
     /**
      * The preLoad event occurs for a document before the document has been loaded
@@ -101,7 +101,7 @@ final class Events
      *
      * @var string
      */
-    const preLoad = "preLoad";
+    const PRELOAD = "preLoad";
 
     /**
      * The postLoad event occurs for a document after the document has been loaded
@@ -116,22 +116,22 @@ final class Events
      *
      * @var string
      */
-    const postLoad = "postLoad";
+    const POSTLOAD = "postLoad";
 
     /**
      * The loadClassMetadata event occurs after the mapping metadata for a class
      * has been loaded from a mapping source (annotations/xml/yaml).
-     *
+     * 
      * @var string
      */
-    const loadClassMetadata = "loadClassMetadata";
+    const LOADCLASSMETADATA = "loadClassMetadata";
 
     /**
      * The preFlush event occurs when the DocumentManager#flush() operation is invoked,
      * but before any changes to managed documents have been calculated. This event is
      * always raised right after DocumentManager#flush() call.
      */
-    const preFlush = "preFlush";
+    const PREFLUSH = "preFlush";
 
     /**
      * The onFlush event occurs when the DocumentManager#flush() operation is invoked,
@@ -142,7 +142,7 @@ final class Events
      *
      * @var string
      */
-    const onFlush = "onFlush";
+    const ONFLUSH = "onFlush";
 
     /**
      * The postFlush event occurs when the DocumentManager#flush() operation is invoked and
@@ -153,7 +153,7 @@ final class Events
      *
      * @var string
      */
-    const postFlush = "postFlush";
+    const POSTFLUSH = "postFlush";
 
     /**
      * The onClear event occurs when the DocumentManager#clear() operation is invoked,
@@ -161,5 +161,5 @@ final class Events
      *
      * @var string
      */
-    const onClear = "onClear";
+    const ONCLEAR = "onClear";
 }
