@@ -683,7 +683,7 @@ class ClassMetadataInfo implements ClassMetadata
                 if  !class_exists(className) {
                     throw MappingException::invalidClassInDiscriminatorMap(className, this->name);
                 }
-                if is_subclass_of(className, this->name) {
+                if (className instanceof this->name) {
                    let this->subClasses[] = className;
                 }
             }
@@ -1461,8 +1461,7 @@ class ClassMetadataInfo implements ClassMetadata
      */
     public function setFieldValue(document, field, value)
     {
-        //if document instanceof \Proxy && !document->__isInitialized() {
-        if is_subclass_of(document, "Proxy") && !document->__isInitialized() {
+        if document instanceof \Doctrine\Common\Persistence\Proxy && !document->__isInitialized() {
             //property changes to an uninitialized proxy will not be tracked or persisted,
             //so the proxy needs to be loaded first.
             document->__load();
@@ -1481,8 +1480,7 @@ class ClassMetadataInfo implements ClassMetadata
      */
     public function getFieldValue(document, field)
     {
-        //if document instanceof Proxy && field !== this->identifier && ! document->__isInitialized() {
-        if is_subclass_of(document, "Proxy") && field !== this->identifier && ! document->__isInitialized() {
+        if document instanceof Proxy && field !== this->identifier && ! document->__isInitialized() {
             document->__load();
         }
         

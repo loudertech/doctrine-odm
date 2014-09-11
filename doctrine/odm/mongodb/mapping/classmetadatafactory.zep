@@ -258,8 +258,7 @@ class ClassMetadataFactory extends AbstractClassMetadataFactory
 
                 let customGenerator = new idGenOptions["class"];
                 unset(idGenOptions["class"]);
-                //if  !customGenerator instanceof AbstractIdGenerator {
-                if  !is_subclass_of(customGenerator, "AbstractIdGenerator") {
+                if  !(customGenerator instanceof AbstractIdGenerator) {
                     throw MappingException::classIsNotAValidGenerator(get_class(customGenerator));
                 }
 

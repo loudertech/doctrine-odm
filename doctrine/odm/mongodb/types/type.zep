@@ -52,44 +52,53 @@ abstract class Type
     const OBJECTID = "object_id";
     const RAW = "raw";
 
-    /** Map of already instantiated type objects. One instance per type (flyweight). */
-    private static typeObjects = [];
+    /** 
+    * Map of already instantiated type objects. One instance per type (flyweight). 
+    */
+    private static typeObjects;
 
-    /** The map of supported doctrine mapping types. */
-    private static typesMap = [
-        "id" : "Doctrine\\ODM\\MongoDB\\Types\\IdType",
-        "int_id" : "Doctrine\\ODM\\MongoDB\\Types\\IntIdType",
-        "custom_id" : "Doctrine\\ODM\\MongoDB\\Types\\CustomIdType",
-        "boolean" : "Doctrine\\ODM\\MongoDB\\Types\\BooleanType",
-        "int" : "Doctrine\\ODM\\MongoDB\\Types\\IntType",
-        "float" : "Doctrine\\ODM\\MongoDB\\Types\\FloatType",
-        "string" : "Doctrine\\ODM\\MongoDB\\Types\\StringType",
-        "date" : "Doctrine\\ODM\\MongoDB\\Types\\DateType",
-        "key" : "Doctrine\\ODM\\MongoDB\\Types\\KeyType",
-        "timestamp" : "Doctrine\\ODM\\MongoDB\\Types\\TimestampType",
-        "bin" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataType",
-        "bin" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataFuncType",
-        "bin_bytearray" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataByteArrayType",
-        "bin_uuid" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataUUIDType",
-        "bin_md5" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataMD5Type",
-        "bin_custom" : "Doctrine\\ODM\MongoDB\\Types\\BinDataCustomType",
-        "file" : "Doctrine\\ODM\\MongoDB\\Types\\FileType",
-        "hash" : "Doctrine\\ODM\\MongoDB\\Types\\HashType",
-        "collection" : "Doctrine\\ODM\\MongoDB\\Types\\CollectionType",
-        "increment" : "Doctrine\\ODM\\MongoDB\\Types\\IncrementType",
-        "object_id" : "Doctrine\\ODM\\MongoDB\\Types\\ObjectIdType",
-        "raw" : "Doctrine\\ODM\\MongoDB\\Types\\RawType"
-    ];
+    /** 
+    * The map of supported doctrine mapping typ
+    */
+    private static typesMap = null;
 
-    /* Prevent instantiation and force use of the factory method. */
-    final private function __construct() {}
+    //Prevent instantiation and force use of the factory method 
+    final private function __construct()
+    {
+        if self::typesMap == null {
+            let self::typesMap = [
+                "id" : "Doctrine\\ODM\\MongoDB\\Types\\IdType",
+                "int_id" : "Doctrine\\ODM\\MongoDB\\Types\\IntIdType",
+                "custom_id" : "Doctrine\\ODM\\MongoDB\\Types\\CustomIdType",
+                "boolean" : "Doctrine\\ODM\\MongoDB\\Types\\BooleanType",
+                "int" : "Doctrine\\ODM\\MongoDB\\Types\\IntType",
+                "float" : "Doctrine\\ODM\\MongoDB\\Types\\FloatType",
+                "string" : "Doctrine\\ODM\\MongoDB\\Types\\StringType",
+                "date" : "Doctrine\\ODM\\MongoDB\\Types\\DateType",
+                "key" : "Doctrine\\ODM\\MongoDB\\Types\\KeyType",
+                "timestamp" : "Doctrine\\ODM\\MongoDB\\Types\\TimestampType",
+                "bin" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataType",
+                "bin" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataFuncType",
+                "bin_bytearray" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataByteArrayType",
+                "bin_uuid" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataUUIDType",
+                "bin_md5" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataMD5Type",
+                "bin_custom" : "Doctrine\\ODM\MongoDB\\Types\\BinDataCustomType",
+                "file" : "Doctrine\\ODM\\MongoDB\\Types\\FileType",
+                "hash" : "Doctrine\\ODM\\MongoDB\\Types\\HashType",
+                "collection" : "Doctrine\\ODM\\MongoDB\\Types\\CollectionType",
+                "increment" : "Doctrine\\ODM\\MongoDB\\Types\\IncrementType",
+                "object_id" : "Doctrine\\ODM\\MongoDB\\Types\\ObjectIdType",
+                "raw" : "Doctrine\\ODM\\MongoDB\\Types\\RawType"
+            ];
+        }
+    }
 
     /**
      * Converts a value from its PHP representation to its database representation
      * of this type.
      *
      * @param mixed value The value to convert.
-     * @return mixed The database representation of the value.
+     * @return mixed The database representation of the val
      */
     public function convertToDatabaseValue(value)
     {
@@ -126,7 +135,7 @@ abstract class Type
      */
     public static function registerType(name, class1)
     {
-        let self::typesMap[name] = class1;
+        let Type::typesMap[name] = class1;
     }
 
     /**
@@ -138,6 +147,8 @@ abstract class Type
      */
     public static function getType(type)
     {
+        var className;
+
         if  !isset self::typesMap[type] {
             throw new \InvalidArgumentException(sprintf("Invalid type specified '%s'.", type));
         }
@@ -157,6 +168,8 @@ abstract class Type
      */
     public static function getTypeFromPHPVariable(variable)
     {
+        var type;
+
         if is_object(variable) {
             if variable instanceof \DateTime {
                 return self::getType("date");
@@ -177,6 +190,8 @@ abstract class Type
 
     public static function convertPHPToDatabaseValue(value)
     {
+        var type;
+        
         let type = self::getTypeFromPHPVariable(value);
         if type !== null {
             return type->convertToDatabaseValue(value);

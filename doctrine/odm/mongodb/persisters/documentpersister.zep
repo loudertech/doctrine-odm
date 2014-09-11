@@ -26,6 +26,7 @@ use Doctrine\ODM\MongoDB\Hydrator\HydratorFactory;
 use Doctrine\ODM\MongoDB\LockException;
 use Doctrine\ODM\MongoDB\LockMode;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo;
 use Doctrine\ODM\MongoDB\PersistentCollection;
 use Doctrine\ODM\MongoDB\Proxy\Proxy;
 use Doctrine\ODM\MongoDB\Query\CriteriaMerger;
@@ -457,8 +458,7 @@ class DocumentPersister
         var cursor, result, lockMapping;
 
         // TODO: remove this
-        //if criteria === null || is_scalar(criteria) || criteria instanceof \MongoId {
-        if criteria === null || is_scalar(criteria) || is_subclass_of(criteria, "MongoId") {
+        if criteria === null || is_scalar(criteria) || criteria instanceof \MongoId {
             let criteria = ["_id" : criteria];
         }
 
@@ -594,6 +594,8 @@ class DocumentPersister
      */
     private function createDocument(result, document = null, array hints = [])
     {
+        var id;
+
         if result === null {
             return null;
         }
@@ -614,13 +616,15 @@ class DocumentPersister
      */
     public function loadCollection( collection)
     {
+        var mapping;
+
         let mapping = collection->getMapping();
         switch mapping["association"] {
-            case ClassMetadata::EMBED_MANY:
+            case ClassMetadataInfo::EMBED_MANY:
                 this->loadEmbedManyCollection(collection);
                 break;
 
-            case ClassMetadata::REFERENCE_MANY:
+            case ClassMetadataInfo::REFERENCE_MANY:
                 if isset mapping["repositoryMethod"] && mapping["repositoryMethod"] {
                     this->loadReferenceManyWithRepositoryMethod(collection);
                 } else {
@@ -636,6 +640,9 @@ class DocumentPersister
 
     private function loadEmbedManyCollection( collection)
     {
+        var embeddedDocuments, mapping, owner, key, embeddedDocument, className, embeddedMetadata,
+            embeddedDocumentObject, data, id;
+
         let embeddedDocuments = collection->getMongoData();
         let mapping = collection->getMapping();
         let owner = collection->getOwner();
@@ -663,6 +670,10 @@ class DocumentPersister
 
     private function loadReferenceManyCollectionOwningSide( collection)
     {
+        var hints, mapping, groupedIds, sorted, key, reference, className, mongoId, id, class1,
+            mongoCollection, criteria, ids, cursor, documents, documentData, document, data, 
+            query;
+
         let hints = collection->getHints();
         let mapping = collection->getMapping();
         let groupedIds = [];
@@ -692,7 +703,7 @@ class DocumentPersister
             }
 
             // only query for the referenced object if it is not already initialized or the collection is sorted
-            if (reference instanceof Proxy && ! reference->__isInitialized__) || sorted {
+            if ( (reference instanceof Proxy) && ! reference->__isInitialized__) || sorted {
                 let groupedIds[className][] = mongoId;
             }
         }
@@ -736,6 +747,8 @@ class DocumentPersister
 
     private function loadReferenceManyCollectionInverseSide( collection)
     {
+        var query, document, key, documents;
+
         let query = this->createReferenceManyInverseSideQuery(collection);
         let documents = query->execute()->toArray(false);
         for key, document in documents {
@@ -750,6 +763,9 @@ class DocumentPersister
      */
     public function createReferenceManyInverseSideQuery( collection)
     {
+        var hints, mapping, owner, ownerClass, targetClass, mappedByMapping, mappedByFieldName,
+            criteria, qb;
+
         let hints = collection->getHints();
         let mapping = collection->getMapping();
         let owner = collection->getOwner();
@@ -787,6 +803,7 @@ class DocumentPersister
 
     private function loadReferenceManyWithRepositoryMethod( collection)
     {
+        var cursor, documents, document;
         let cursor = this->createReferenceManyWithRepositoryMethodCursor(collection);
         let documents = cursor->toArray(false);
         for document in documents {
@@ -801,6 +818,8 @@ class DocumentPersister
      */
     public function createReferenceManyWithRepositoryMethodCursor( collection)
     {
+        var hints, mapping, a, b, cursor;
+
         let hints = collection->getHints();
         let mapping = collection->getMapping();
         let a = this->dm->getRepository(mapping["targetDocument"]);
@@ -835,6 +854,8 @@ class DocumentPersister
      */
     public function prepareSortOrProjection(array fields)
     {
+        var preparedFields, key, value;
+
         let preparedFields = [];
 
         for key, value in fields {
@@ -852,9 +873,10 @@ class DocumentPersister
      */
     public function prepareFieldName(fieldName)
     {
+        var fieldNameArr;
         let fieldNameArr = this->prepareQueryElement(fieldName, null, null, false);
 
-        return fieldName[0];
+        return fieldNameArr[0];
     }
 
     /**
@@ -869,6 +891,8 @@ class DocumentPersister
      */
     public function addDiscriminatorToPreparedQuery(array preparedQuery)
     {
+        var discriminatorValues;
+
         /* If the class has a discriminator field, which is not already in the
          * criteria, inject it now. The field/values need no preparation.
          */
@@ -892,6 +916,7 @@ class DocumentPersister
      */
     public function addFilterToPreparedQuery(array preparedQuery)
     {
+        var a, filterCriteria;
         /* If filter criteria exists for this class, prepare it and merge
          * over the existing query.
          *
@@ -917,6 +942,8 @@ class DocumentPersister
      */
     public function prepareQueryOrNewObj(array query)
     {
+        var preparedQuery, key, value, list, k2, v2;
+
         let preparedQuery = [];
 
         for key, value in query {
@@ -959,7 +986,10 @@ class DocumentPersister
      */
     private function prepareQueryElement(fieldName, value = null, class1 = null, prepareValue = true)
     {
-        let class1 = isset class1 ? class1 : this->class1;
+        var k2, v2, e, mapping, targetClass, objectProperty, objectPropertyPrefix, nextObjectProperty,
+            targetMapping, objectPropertyIsId, nextTargetClass, list, key, k, v;
+
+        let class1 = class1 ? class1 : this->class1;
 
         // @todo Consider inlining calls to ClassMetadataInfo methods
 
@@ -1144,6 +1174,8 @@ class DocumentPersister
      */
     private function prepareQueryExpression(expression, class1)
     {
+        var k, v, k2, v2;
+
         for k, v in expression {
             // Ignore query operators whose arguments need no type conversion
             if in_array(k, ["exists", "type", "mod", "size"]) {
@@ -1183,6 +1215,8 @@ class DocumentPersister
      */
     private function hasDBRefFields(value)
     {
+        var key, a;
+
         if  typeof value != "array" && typeof value != "object" {
             return false;
         }
@@ -1208,6 +1242,7 @@ class DocumentPersister
      */
     private function hasQueryOperators(value)
     {
+        var key, a;
         if  typeof value != "array" && typeof value != "object" {
             return false;
         }
@@ -1233,6 +1268,8 @@ class DocumentPersister
      */
     private function getClassDiscriminatorValues( metadata)
     {
+        var discriminatorValues, className, key;
+        
         let discriminatorValues = [metadata->discriminatorValue];
         for className in metadata->subClasses {
             let key = array_search(className, metadata->discriminatorMap);

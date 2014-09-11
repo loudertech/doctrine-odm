@@ -19,6 +19,7 @@ namespace Doctrine\ODM\MongoDB\Persisters;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadataInfo;
 use Doctrine\ODM\MongoDB\PersistentCollection;
 use Doctrine\ODM\MongoDB\Types\Type;
 use Doctrine\ODM\MongoDB\UnitOfWork;
@@ -67,6 +68,8 @@ class PersistenceBuilder
      */
     public function prepareInsertData(document)
     {
+        var class1, changeset, insertData, mapping, new_, value;
+
         let class1 = this->dm->getClassMetadata(get_class(document));
         let changeset = this->uow->getDocumentChangeSet(document);
 
@@ -74,7 +77,7 @@ class PersistenceBuilder
         for mapping in class1->fieldMappings {
 
             // @ReferenceMany and @EmbedMany are inserted later
-            if mapping["type"] === ClassMetadata::MANY {
+            if mapping["type"] === ClassMetadataInfo::MANY {
                 continue;
             }
 
@@ -93,7 +96,7 @@ class PersistenceBuilder
 
                 // @ReferenceOne
                 } else {
-                    if isset mapping["association"] && mapping["association"] === ClassMetadata::REFERENCE_ONE {
+                    if isset mapping["association"] && mapping["association"] === ClassMetadataInfo::REFERENCE_ONE {
                         if mapping["isInverseSide"] {
                             continue;
                         }
@@ -103,7 +106,7 @@ class PersistenceBuilder
 
                     // @EmbedOne
                     } else {
-                        if isset mapping["association"] && mapping["association"] === ClassMetadata::EMBED_ONE {
+                        if isset mapping["association"] && mapping["association"] === ClassMetadataInfo::EMBED_ONE {
                             let value = this->prepareEmbeddedDocumentValue(mapping, new_);
                         }
                     }
@@ -131,6 +134,9 @@ class PersistenceBuilder
      */
     public function prepareUpdateData(document)
     {
+        var class1, changeset, vupdateData, fieldName, mapping, list, old, new_, change,
+            updateData = [], update, cmd, values, key, value, embedded, embeddedDoc, name;
+
         let class1 = this->dm->getClassMetadata(get_class(document));
         let changeset = this->uow->getDocumentChangeSet(document);
 
@@ -165,15 +171,15 @@ class PersistenceBuilder
 
             // @Field, @String, @Date, etc.
             } else {
-                if  ! isset mapping["association"] {
-                    if isset new_ || mapping["nullable"] === true {
+                if !isset mapping["association"] {
+                    if new_ || mapping["nullable"] === true {
                         let updateData["set"][mapping["name"]] = is_null(new_) ? null : Type::getType(mapping["type"])->convertToDatabaseValue(new_);
                     } else {
                         let updateData["unset"][mapping["name"]] = true;
                     }
                 // @EmbedOne
                 } else {
-                    if isset mapping["association"] && mapping["association"] === ClassMetadata::EMBED_ONE {
+                    if isset mapping["association"] && mapping["association"] === ClassMetadataInfo::EMBED_ONE {
                         // If we have a new embedded document then lets set the whole thing
                         if new_ && this->uow->isScheduledForInsert(new_) {
                             let updateData["set"][mapping["name"]] = this->prepareEmbeddedDocumentValue(mapping, new_);
@@ -196,7 +202,7 @@ class PersistenceBuilder
                     
                     // @EmbedMany
                     } else {
-                        if isset mapping["association"] && mapping["association"] === ClassMetadata::EMBED_MANY {
+                        if isset mapping["association"] && mapping["association"] === ClassMetadataInfo::EMBED_MANY {
                             if null !== new_ {
                                 for embeddedDoc in new_ {
                                     if  !this->uow->isScheduledForInsert(embeddedDoc) {
@@ -211,15 +217,15 @@ class PersistenceBuilder
                             }
                         // @ReferenceOne
                         } else {
-                            if isset mapping["association"] && mapping["association"] === ClassMetadata::REFERENCE_ONE && mapping["isOwningSide"] {
-                                if isset new_ || mapping["nullable"] === true {
+                            if isset mapping["association"] && mapping["association"] === ClassMetadataInfo::REFERENCE_ONE && mapping["isOwningSide"] {
+                                if new_ || mapping["nullable"] === true {
                                     let updateData["set"][mapping["name"]] = (is_null(new_) ? null : this->prepareReferencedDocumentValue(mapping, new_));
                                 } else {
                                     let updateData["unset"][mapping["name"]] = true;
                                 }
                             // @ReferenceMany
                             } else {
-                                if isset mapping["association"] && mapping["association"] === ClassMetadata::REFERENCE_MANY {
+                                if isset mapping["association"] && mapping["association"] === ClassMetadataInfo::REFERENCE_MANY {
                                     // Do nothing right now
                                 }
                             }
@@ -239,6 +245,9 @@ class PersistenceBuilder
      */
     public function prepareUpsertData(document)
     {
+        var class1, changeset, updateData, fieldName, change, list, old, new_, mapping,
+            update, cmd, value, values, key, embeddedDoc, name;
+
         let class1 = this->dm->getClassMetadata(get_class(document));
         let changeset = this->uow->getDocumentChangeSet(document);
 
@@ -261,13 +270,13 @@ class PersistenceBuilder
             // @Field, @String, @Date, etc.
             } else {
                 if  !isset mapping["association"] {
-                    if isset new_ || mapping["nullable"] === true {
+                    if new_ || mapping["nullable"] === true {
                         let updateData["set"][mapping["name"]] = (is_null(new_) ? null : Type::getType(mapping["type"])->convertToDatabaseValue(new_));
                     }
                 
                 // @EmbedOne
                 } else {
-                    if isset mapping["association"] && mapping["association"] === ClassMetadata::EMBED_ONE {
+                    if isset mapping["association"] && mapping["association"] === ClassMetadataInfo::EMBED_ONE {
                         // If we have a new embedded document then lets set the whole thing
                         if new_ && this->uow->isScheduledForInsert(new_) {
                             let updateData["set"][mapping["name"]] = this->prepareEmbeddedDocumentValue(mapping, new_);
@@ -290,7 +299,7 @@ class PersistenceBuilder
 
                     // @EmbedMany
                     } else {
-                        if isset mapping["association"] && mapping["association"] === ClassMetadata::EMBED_MANY && new_ {
+                        if isset mapping["association"] && mapping["association"] === ClassMetadataInfo::EMBED_MANY && new_ {
                             for key, embeddedDoc in new_ {
                                 if  !this->uow->isScheduledForInsert(embeddedDoc) {
                                     let update = this->prepareUpsertData(embeddedDoc);
@@ -303,13 +312,13 @@ class PersistenceBuilder
                             }
                         // @ReferenceOne
                         } else {
-                            if isset mapping["association"] && mapping["association"] === ClassMetadata::REFERENCE_ONE && mapping["isOwningSide"] {
-                                if isset new_ || mapping["nullable"] === true {
+                            if isset mapping["association"] && mapping["association"] === ClassMetadataInfo::REFERENCE_ONE && mapping["isOwningSide"] {
+                                if new_ || mapping["nullable"] === true {
                                     let updateData["set"][mapping["name"]] = (is_null(new_) ? null : this->prepareReferencedDocumentValue(mapping, new_));
                                 }
                             // @ReferenceMany
                             } else {
-                                if isset mapping["association"] && mapping["association"] === ClassMetadata::REFERENCE_MANY {
+                                if isset mapping["association"] && mapping["association"] === ClassMetadataInfo::REFERENCE_MANY {
                                 // Do nothing right now
                                 }
                             }
@@ -362,6 +371,9 @@ class PersistenceBuilder
      */
     public function prepareEmbeddedDocumentValue(array embeddedMapping, embeddedDocument)
     {
+        var embeddedDocumentValue, class1, mapping, rawValue, value, pb, discriminatorField,
+            discriminatorValue;
+
         let embeddedDocumentValue = [];
         let class1 = this->dm->getClassMetadata(get_class(embeddedDocument));
 
@@ -383,22 +395,22 @@ class PersistenceBuilder
                         let value = Type::getType(mapping["type"])->convertToDatabaseValue(rawValue);
                         break;
 
-                    case ClassMetadata::EMBED_ONE:
-                    case ClassMetadata::REFERENCE_ONE:
+                    case ClassMetadataInfo::EMBED_ONE:
+                    case ClassMetadataInfo::REFERENCE_ONE:
                         let value = this->prepareAssociatedDocumentValue(mapping, rawValue);
                         break;
 
-                    case ClassMetadata::EMBED_MANY:
-                    case ClassMetadata::REFERENCE_MANY:
+                    case ClassMetadataInfo::EMBED_MANY:
+                    case ClassMetadataInfo::REFERENCE_MANY:
                         // Skip PersistentCollections already scheduled for deletion/update
-                        if rawValue instanceof PersistentCollection &&
+                        if (rawValue instanceof PersistentCollection) &&
                             (this->uow->isCollectionScheduledForDeletion(rawValue) ||
                              this->uow->isCollectionScheduledForUpdate(rawValue)) {
                             break;
                         }
 
                         let pb = this;
-                        let value = rawValue->map(a_)->toArray;
+                        let value = rawValue->map(a_(this, pb, mapping))->toArray;
 
                         // Numerical reindexing may be necessary to ensure BSON array storage
                         if in_array(mapping["strategy"], ["setArray", "pushAll", "addToSet"]) {
