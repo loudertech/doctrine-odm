@@ -36,381 +36,393 @@ use Doctrine\Common\Util\ClassUtils;
  */
 abstract class AbstractClassMetadataFactory implements ClassMetadataFactory
 {
-    /**
-     * Salt used by specific Object Manager implementation.
-     *
-     * @var string
-     */
-    protected cacheSalt = "CLASSMETADATA";
+	/**
+	 * Salt used by specific Object Manager implementation.
+	 *
+	 * @var string
+	 */
+	protected cacheSalt = "$CLASSMETADATA"; // No creo
 
-    /**
-     * @var \Doctrine\Common\Cache\Cache|null
-     */
-    private cacheDriver;
+	/**
+	 * @var \Doctrine\Common\Cache\Cache|null
+	 */
+	protected cacheDriver;
 
-    /**
-     * @var array
-     */
-    private loadedMetadata = [];
+	/**
+	 * @var array
+	 */
+	protected loadedMetadata = [];
 
-    /**
-     * @var bool
-     */
-    protected initialized = false;
+	/**
+	 * @var bool
+	 */
+	protected initialized = false;
 
-    /**
-     * @var ReflectionService|null
-     */
-    private reflectionService = null;
+	/**
+	 * @var ReflectionService|null
+	 */
+	protected reflectionService = null;
 
-    /**
-     * Sets the cache driver used by the factory to cache ClassMetadata instances.
-     *
-     * @param \Doctrine\Common\Cache\Cache cacheDriver
-     *
-     * @return void
-     */
-    public function setCacheDriver(<Cache> cacheDriver = null)
-    {
-        let this->cacheDriver = cacheDriver;
-    }
+	/**
+	 * Sets the cache driver used by the factory to cache ClassMetadata instances.
+	 *
+	 * @param \Doctrine\Common\Cache\Cache cacheDriver
+	 *
+	 * @return void
+	 */
+	public function setCacheDriver(<Cache> cacheDriver = null)
+	{
+		let this->cacheDriver = cacheDriver;
+	}
 
-    /**
-     * Gets the cache driver used by the factory to cache ClassMetadata instances.
-     *
-     * @return \Doctrine\Common\Cache\Cache|null
-     */
-    public function getCacheDriver()
-    {
-        return this->cacheDriver;
-    }
+	/**
+	 * Gets the cache driver used by the factory to cache ClassMetadata instances.
+	 *
+	 * @return \Doctrine\Common\Cache\Cache|null
+	 */
+	public function getCacheDriver()
+	{
+		return this->cacheDriver;
+	}
 
-    /**
-     * Returns an array of all the loaded metadata currently in memory.
-     *
-     * @return array
-     */
-    public function getLoadedMetadata()
-    {
-        return this->loadedMetadata;
-    }
+	/**
+	 * Returns an array of all the loaded metadata currently in memory.
+	 *
+	 * @return array
+	 */
+	public function getLoadedMetadata()
+	{
+		return this->loadedMetadata;
+	}
 
-    /**
-     * Forces the factory to load the metadata of all classes known to the underlying
-     * mapping driver.
-     *
-     * @return array The ClassMetadata instances of all mapped classes.
-     */
-    public function getAllMetadata()
-    {
-        var driver, metadata, className;
+	/**
+	 * Forces the factory to load the metadata of all classes known to the underlying
+	 * mapping driver.
+	 *
+	 * @return array The ClassMetadata instances of all mapped classes.
+	 */
+	public function getAllMetadata()
+	{
+		var driver, metadata, className;
 
-        if  !this->initialized {
-            this->initialize();
-        }
+		if  !this->initialized {
+			this->initialize();
+		}
 
-        let driver = this->getDriver();
-        let metadata = [];
-        for className in driver->getAllClassNames() {
-            let metadata[] = this->getMetadataFor(className);
-        }
+		let driver = this->getDriver();
+		let metadata = [];
+		for className in driver->getAllClassNames() {
+			let metadata[] = this->getMetadataFor(className);
+		}
 
-        return metadata;
-    }
+		return metadata;
+	}
 
-    /**
-     * Lazy initialization of this stuff, especially the metadata driver,
-     * since these are not needed at all when a metadata cache is active.
-     *
-     * @return void
-     */
-    abstract protected function initialize();
+	/**
+	 * Lazy initialization of this stuff, especially the metadata driver,
+	 * since these are not needed at all when a metadata cache is active.
+	 *
+	 * @return void
+	 */
+	abstract protected function initialize();
 
-    /**
-     * Gets the fully qualified class-name from the namespace alias.
-     *
-     * @param string namespaceAlias
-     * @param string simpleClassName
-     *
-     * @return string
-     */
-    abstract protected function getFqcnFromAlias(namespaceAlias, simpleClassName);
+	/**
+	 * Gets the fully qualified class-name from the namespace alias.
+	 *
+	 * @param string namespaceAlias
+	 * @param string simpleClassName
+	 *
+	 * @return string
+	 */
+	abstract protected function getFqcnFromAlias(namespaceAlias, simpleClassName);
 
-    /**
-     * Returns the mapping driver implementation.
-     *
-     * @return \Doctrine\Common\Persistence\Mapping\Driver\MappingDriver
-     */
-    abstract protected function getDriver();
+	/**
+	 * Returns the mapping driver implementation.
+	 *
+	 * @return \Doctrine\Common\Persistence\Mapping\Driver\MappingDriver
+	 */
+	abstract protected function getDriver();
 
-    /**
-     * Wakes up reflection after ClassMetadata gets unserialized from cache.
-     *
-     * @param ClassMetadata     class
-     * @param ReflectionService reflService
-     *
-     * @return void
-     */
-    abstract protected function wakeupReflection(<ClassMetadata> class1, <ReflectionService> reflService);
+	/**
+	 * Wakes up reflection after ClassMetadata gets unserialized from cache.
+	 *
+	 * @param ClassMetadata     class
+	 * @param ReflectionService reflService
+	 *
+	 * @return void
+	 */
+	abstract protected function wakeupReflection(<ClassMetadata> class1, <ReflectionService> reflService);
 
-    /**
-     * Initializes Reflection after ClassMetadata was constructed.
-     *
-     * @param ClassMetadata     class
-     * @param ReflectionService reflService
-     *
-     * @return void
-     */
-    abstract protected function initializeReflection(<ClassMetadata> class1, <ReflectionService> reflService);
+	/**
+	 * Initializes Reflection after ClassMetadata was constructed.
+	 *
+	 * @param ClassMetadata     class
+	 * @param ReflectionService reflService
+	 *
+	 * @return void
+	 */
+	abstract protected function initializeReflection(<ClassMetadata> class1, <ReflectionService> reflService);
 
-    /**
-     * Checks whether the class metadata is an entity.
-     *
-     * This method should return false for mapped superclasses or embedded classes.
-     *
-     * @param ClassMetadata class
-     *
-     * @return boolean
-     */
-    abstract protected function isEntity(<ClassMetadata> class1);
+	/**
+	 * Checks whether the class metadata is an entity.
+	 *
+	 * This method should return false for mapped superclasses or embedded classes.
+	 *
+	 * @param ClassMetadata class
+	 *
+	 * @return boolean
+	 */
+	abstract protected function isEntity(<ClassMetadata> class1);
 
-    /**
-     * Gets the class metadata descriptor for a class.
-     *
-     * @param string className The name of the class.
-     *
-     * @return \Doctrine\Common\Persistence\Mapping\ClassMetadata
-     */
-    public function getMetadataFor(className)
-    {
-        var realClassName, list, namespaceAlias, simpleClassName, cached, loadedClassName;
+	/**
+	 * Gets the class metadata descriptor for a class.
+	 *
+	 * @param string className The name of the class.
+	 *
+	 * @return \Doctrine\Common\Persistence\Mapping\ClassMetadata
+	 */
+	public function getMetadataFor(className)
+	{
+		var realClassName, list, namespaceAlias, simpleClassName, cached, loadedClassName;
 
-        if isset this->loadedMetadata[className] {
-            return this->loadedMetadata[className];
-        }
+		if isset this->loadedMetadata[className] {
+			return this->loadedMetadata[className];
+		}
 
-        let realClassName = className;
+		let realClassName = className;
 
-        // Check for namespace alias
-        if strpos(className, ":") !== false {
-            let list = explode(":", className);
-            let namespaceAlias = list[0];
-            let simpleClassName = list[1];
-            let realClassName = this->getFqcnFromAlias(namespaceAlias, simpleClassName);
-        } else {
-            let realClassName = ClassUtils::getRealClass(realClassName);
-        }
+		// Check for namespace alias
+		if strpos(className, ":") !== false {
+			let list = explode(":", className);
+			let namespaceAlias = list[0];
+			let simpleClassName = list[1];
+			let realClassName = this->getFqcnFromAlias(namespaceAlias, simpleClassName);
+		} else {
+			let realClassName = ClassUtils::getRealClass(realClassName);
+		}
 
-        if isset this->loadedMetadata[realClassName] {
-            // We do not have the alias name in the map, include it
-            let this->loadedMetadata[className] = this->loadedMetadata[realClassName];
+		if isset this->loadedMetadata[realClassName] {
+			// We do not have the alias name in the map, include it
+			let this->loadedMetadata[className] = this->loadedMetadata[realClassName];
 
-            return this->loadedMetadata[realClassName];
-        }
+			return this->loadedMetadata[realClassName];
+		}
 
-        if this->cacheDriver {
-            let cached = this->cacheDriver->{"fetch"}(realClassName . this->cacheSalt);
-            if cached !== false {
-                let this->loadedMetadata[realClassName] = cached;
-                this->wakeupReflection(cached, this->getReflectionService());
-            } else {
-                for loadedClassName in this->loadMetadata(realClassName) {
-                    this->cacheDriver->save(
-                        loadedClassName . this->cacheSalt, this->loadedMetadata[loadedClassName], null
-                    );
-                }
-            }
-        } else {
-            this->loadMetadata(realClassName);
-        }
+		if this->cacheDriver {
+			let cached = this->cacheDriver->{"fetch"}(realClassName . this->cacheSalt);
+			if cached !== false {
+				let this->loadedMetadata[realClassName] = cached;
+				this->wakeupReflection(cached, this->getReflectionService());
+			} else {
+				for loadedClassName in this->loadMetadata(realClassName) {
+					this->cacheDriver->save(
+						loadedClassName . this->cacheSalt, this->loadedMetadata[loadedClassName], null
+					);
+				}
+			}
+		} else {
+			this->loadMetadata(realClassName);
+		}
 
-        if className != realClassName {
-            // We do not have the alias name in the map, include it
-            let this->loadedMetadata[className] = this->loadedMetadata[realClassName];
-        }
+		if className != realClassName {
+			// We do not have the alias name in the map, include it
+			let this->loadedMetadata[className] = this->loadedMetadata[realClassName];
+		}
 
-        return this->loadedMetadata[className];
-    }
+		return this->loadedMetadata[className];
+	}
 
-    /**
-     * Checks whether the factory has the metadata for a class loaded already.
-     *
-     * @param string className
-     *
-     * @return boolean TRUE if the metadata of the class in question is already loaded, FALSE otherwise.
-     */
-    public function hasMetadataFor(className)
-    {
-        return isset this->loadedMetadata[className];
-    }
+	/**
+	 * Checks whether the factory has the metadata for a class loaded already.
+	 *
+	 * @param string className
+	 *
+	 * @return boolean TRUE if the metadata of the class in question is already loaded, FALSE otherwise.
+	 */
+	public function hasMetadataFor(className)
+	{
+		return isset this->loadedMetadata[className];
+	}
 
-    /**
-     * Sets the metadata descriptor for a specific class.
-     *
-     * NOTE: This is only useful in very special cases, like when generating proxy classes.
-     *
-     * @param string        className
-     * @param ClassMetadata class
-     *
-     * @return void
-     */
-    public function setMetadataFor(className, class1)
-    {
-        let this->loadedMetadata[className] = class1;
-    }
+	/**
+	 * Sets the metadata descriptor for a specific class.
+	 *
+	 * NOTE: This is only useful in very special cases, like when generating proxy classes.
+	 *
+	 * @param string        className
+	 * @param ClassMetadata class
+	 *
+	 * @return void
+	 */
+	public function setMetadataFor(className, class1)
+	{
+		let this->loadedMetadata[className] = class1;
+	}
 
-    /**
-     * Gets an array of parent classes for the given entity class.
-     *
-     * @param string name
-     *
-     * @return array
-     */
-    protected function getParentClasses(name)
-    {
-        var parentClasses, parentClass;
+	/**
+	 * Gets an array of parent classes for the given entity class.
+	 *
+	 * @param string name
+	 *
+	 * @return array
+	 */
+	protected function getParentClasses(name)
+	{
+		var parentClasses, parentClass;
 
-        // Collect parent classes, ignoring transient (not-mapped) classes.
-        let parentClasses = [];
-        for parentClass in array_reverse(this->getReflectionService()->getParentClasses(name)) {
-            if  !this->getDriver()->isTransient(parentClass) {
-                let parentClasses[] = parentClass;
-            }
-        }
-        return parentClasses;
-    }
+		// Collect parent classes, ignoring transient (not-mapped) classes.
+		let parentClasses = [];
+		for parentClass in reverse this->getReflectionService()->getParentClasses(name) {
+			if  !this->getDriver()->isTransient(parentClass) {
+				let parentClasses[] = parentClass;
+			}
+		}
+		return parentClasses;
+	}
 
-    /**
-     * Loads the metadata of the class in question and all it"s ancestors whose metadata
-     * is still not loaded.
-     *
-     * Important: The class name does not necesarily exist at this point here.
-     * Scenarios in a code-generation setup might have access to XML/YAML
-     * Mapping files without the actual PHP code existing here. That is why the
-     * {@see Doctrine\Common\Persistence\Mapping\ReflectionService} interface
-     * should be used for reflection.
-     *
-     * @param string name The name of the class for which the metadata should get loaded.
-     *
-     * @return array
-     */
-    protected function loadMetadata(name)
-    {
-        var loaded, parentClasses, parent, rootEntityFound, visited, reflService, className,
-            class1;
+	/**
+	 * Loads the metadata of the class in question and all it"s ancestors whose metadata
+	 * is still not loaded.
+	 *
+	 * Important: The class name does not necesarily exist at this point here.
+	 * Scenarios in a code-generation setup might have access to XML/YAML
+	 * Mapping files without the actual PHP code existing here. That is why the
+	 * {@see Doctrine\Common\Persistence\Mapping\ReflectionService} interface
+	 * should be used for reflection.
+	 *
+	 * @param string name The name of the class for which the metadata should get loaded.
+	 *
+	 * @return array
+	 */
+	protected function loadMetadata(name)
+	{
+		var loaded, parentClasses, parent, rootEntityFound, visited, reflService, className,
+			class1;
 
-        if  ! this->initialized {
-            this->initialize();
-        }
+		if  ! this->initialized {
+			this->initialize();
+		}
 
-        let loaded = [];
+		let loaded = [];
 
-        let parentClasses = this->getParentClasses(name);
-        let parentClasses[] = name;
+		let parentClasses = this->getParentClasses(name);
+		if typeof parentClasses != "array" {
+			let parentClasses = [];
+		}
+		let parentClasses[] = name;
 
-        // Move down the hierarchy of parent classes, starting from the topmost class
-        let parent = null;
-        let rootEntityFound = false;
-        let visited = [];
-        let reflService = this->getReflectionService();
-        for className in parentClasses {
-            if isset this->loadedMetadata[className] {
-                let parent = this->loadedMetadata[className];
-                if this->isEntity(parent) {
-                    let rootEntityFound = true;
-                    array_unshift(visited, className);
-                }
-                continue;
-            }
+		//var_dump(parentClasses);
 
-            let class1 = this->newClassMetadataInstance(className);
-            this->initializeReflection(class1, reflService);
+		// Move down the hierarchy of parent classes, starting from the topmost class
+		let parent = null;
+		let rootEntityFound = false;
+		let visited = [];
+		let reflService = this->getReflectionService();
+		for className in parentClasses {
 
-            this->doLoadMetadata(class1, parent, rootEntityFound, visited);
+			if isset this->loadedMetadata[className] {
+				//echo "nelson 1";
+				let parent = this->loadedMetadata[className];
+				if this->isEntity(parent) {
+					let rootEntityFound = true;
+					array_unshift(visited, className);
+				}
+				continue;
+			}
 
-            let this->loadedMetadata[className] = class1;
+			//echo "nelson 2";
+			let class1 = this->newClassMetadataInstance(className);
+			this->initializeReflection(class1, reflService);
 
-            let parent = class1;
+			//var_dump(className);
 
-            if this->isEntity(class1) {
-                let rootEntityFound = true;
-                array_unshift(visited, className);
-            }
+			this->doLoadMetadata(class1, parent, rootEntityFound, visited);
+			let this->loadedMetadata[className] = class1;
+			//var_dump(this->loadedMetadata);
 
-            this->wakeupReflection(class1, reflService);
+			let parent = class1;
 
-            let loaded[] = className;
-        }
+			if this->isEntity(class1) {
+				let rootEntityFound = true;
+				array_unshift(visited, className);
+			}
 
-        return loaded;
-    }
+			this->wakeupReflection(class1, reflService);
 
-    /**
-     * Actually loads the metadata from the underlying metadata.
-     *
-     * @param ClassMetadata      class
-     * @param ClassMetadata|null parent
-     * @param bool               rootEntityFound
-     * @param array              nonSuperclassParents All parent class names
-     *                                                 that are not marked as mapped superclasses.
-     *
-     * @return void
-     */
-    abstract protected function doLoadMetadata(class1, parent, rootEntityFound, array nonSuperclassParents);
+			let loaded[] = className;
+		}
 
-    /**
-     * Creates a new ClassMetadata instance for the given class name.
-     *
-     * @param string className
-     *
-     * @return ClassMetadata
-     */
-    abstract protected function newClassMetadataInstance(className);
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isTransient(class1)
-    {
-        var list, namespaceAlias, simpleClassName;
 
-        if  ! this->initialized {
-            this->initialize();
-        }
+		return loaded;
+	}
 
-        // Check for namespace alias
-        if strpos(class1, ":") !== false {
-            let list = explode(":", class1);
-            let namespaceAlias = list[0];
-            let simpleClassName = list[1];
-            let class1 = this->getFqcnFromAlias(namespaceAlias, simpleClassName);
-        }
+	/**
+	 * Actually loads the metadata from the underlying metadata.
+	 *
+	 * @param ClassMetadata      class
+	 * @param ClassMetadata|null parent
+	 * @param bool               rootEntityFound
+	 * @param array              nonSuperclassParents All parent class names
+	 *                                                 that are not marked as mapped superclasses.
+	 *
+	 * @return void
+	 */
+	abstract protected function doLoadMetadata(class1, parent, rootEntityFound, array nonSuperclassParents);
 
-        return this->getDriver()->isTransient(class1);
-    }
+	/**
+	 * Creates a new ClassMetadata instance for the given class name.
+	 *
+	 * @param string className
+	 *
+	 * @return ClassMetadata
+	 */
+	abstract protected function newClassMetadataInstance(className);
 
-    /**
-     * Sets the reflectionService.
-     *
-     * @param ReflectionService reflectionService
-     *
-     * @return void
-     */
-    public function setReflectionService(<ReflectionService> reflectionService)
-    {
-        let this->reflectionService = reflectionService;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public function isTransient(class1)
+	{
+		var list, namespaceAlias, simpleClassName;
 
-    /**
-     * Gets the reflection service associated with this metadata factory.
-     *
-     * @return ReflectionService
-     */
-    public function getReflectionService()
-    {
-        if this->reflectionService === null {
-            let this->reflectionService = new RuntimeReflectionService();
-        }
-        return this->reflectionService;
-    }
+		if  ! this->initialized {
+			this->initialize();
+		}
+
+		// Check for namespace alias
+		if strpos(class1, ":") !== false {
+			let list = explode(":", class1);
+			let namespaceAlias = list[0];
+			let simpleClassName = list[1];
+			let class1 = this->getFqcnFromAlias(namespaceAlias, simpleClassName);
+		}
+
+		return this->getDriver()->isTransient(class1);
+	}
+
+	/**
+	 * Sets the reflectionService.
+	 *
+	 * @param ReflectionService reflectionService
+	 *
+	 * @return void
+	 */
+	public function setReflectionService(<ReflectionService> reflectionService)
+	{
+		let this->reflectionService = reflectionService;
+	}
+
+	/**
+	 * Gets the reflection service associated with this metadata factory.
+	 *
+	 * @return ReflectionService
+	 */
+	public function getReflectionService()
+	{
+		if this->reflectionService === null {
+			let this->reflectionService = new RuntimeReflectionService();
+		}
+		return this->reflectionService;
+	}
 }

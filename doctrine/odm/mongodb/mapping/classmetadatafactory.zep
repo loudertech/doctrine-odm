@@ -216,9 +216,11 @@ class ClassMetadataFactory extends AbstractClassMetadataFactory
 
         let idGenOptions = class1->generatorOptions;
         switch class1->generatorType {
+
             case 1://ClassMetadata::GENERATOR_TYPE_AUTO:
                 class1->setIdGenerator(new \Doctrine\ODM\MongoDB\Id\AutoGenerator(class1));
                 break;
+
             case 2://ClassMetadata::GENERATOR_TYPE_INCREMENT:
                 let incrementGenerator = new \Doctrine\ODM\MongoDB\Id\IncrementGenerator(class1);
                 if isset idGenOptions["key"] {
@@ -229,13 +231,15 @@ class ClassMetadataFactory extends AbstractClassMetadataFactory
                 }
                 class1->setIdGenerator(incrementGenerator);
                 break;
+
             case 3://ClassMetadata::GENERATOR_TYPE_UUID:
                 let uuidGenerator = new \Doctrine\ODM\MongoDB\Id\UuidGenerator(class1);
-                if isset idGenOptions["salt"] { 
+                if isset idGenOptions["salt"] {
                     uuidGenerator->setSalt(idGenOptions["salt"]);
                 }
                 class1->setIdGenerator(uuidGenerator);
                 break;
+
             case 4://ClassMetadata::GENERATOR_TYPE_ALNUM:
                 let alnumGenerator = new \Doctrine\ODM\MongoDB\Id\AlnumGenerator(class1);
                 if isset idGenOptions["pad"] {
@@ -248,9 +252,9 @@ class ClassMetadataFactory extends AbstractClassMetadataFactory
                         alnumGenerator->setAwkwardSafeMode(idGenOptions["awkwardSafe"]);
                     }
                 }
-
                 class1->setIdGenerator(alnumGenerator);
                 break;
+
             case 5://ClassMetadata::GENERATOR_TYPE_CUSTOM:
                 if empty idGenOptions["class"] {
                     //throw MappingException::missingIdGeneratorClass(class1->name);
