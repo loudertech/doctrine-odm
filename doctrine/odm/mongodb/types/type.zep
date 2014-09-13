@@ -96,6 +96,7 @@ abstract class Type
                 "raw" : "Doctrine\\ODM\\MongoDB\\Types\\RawType"
             ];
         }
+        return self::typesMap;
     }
 
     /**
@@ -155,7 +156,30 @@ abstract class Type
         var className;
         
         if self::typesMap == null {
-            self::init();
+            let self::typesMap = [
+                "id" : "Doctrine\\ODM\\MongoDB\\Types\\IdType",
+                "int_id" : "Doctrine\\ODM\\MongoDB\\Types\\IntIdType",
+                "custom_id" : "Doctrine\\ODM\\MongoDB\\Types\\CustomIdType",
+                "boolean" : "Doctrine\\ODM\\MongoDB\\Types\\BooleanType",
+                "int" : "Doctrine\\ODM\\MongoDB\\Types\\IntType",
+                "float" : "Doctrine\\ODM\\MongoDB\\Types\\FloatType",
+                "string" : "Doctrine\\ODM\\MongoDB\\Types\\StringType",
+                "date" : "Doctrine\\ODM\\MongoDB\\Types\\DateType",
+                "key" : "Doctrine\\ODM\\MongoDB\\Types\\KeyType",
+                "timestamp" : "Doctrine\\ODM\\MongoDB\\Types\\TimestampType",
+                "bin" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataType",
+                "bin" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataFuncType",
+                "bin_bytearray" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataByteArrayType",
+                "bin_uuid" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataUUIDType",
+                "bin_md5" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataMD5Type",
+                "bin_custom" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataCustomType",
+                "file" : "Doctrine\\ODM\\MongoDB\\Types\\FileType",
+                "hash" : "Doctrine\\ODM\\MongoDB\\Types\\HashType",
+                "collection" : "Doctrine\\ODM\\MongoDB\\Types\\CollectionType",
+                "increment" : "Doctrine\\ODM\\MongoDB\\Types\\IncrementType",
+                "object_id" : "Doctrine\\ODM\\MongoDB\\Types\\ObjectIdType",
+                "raw" : "Doctrine\\ODM\\MongoDB\\Types\\RawType"
+            ];
         }
 
         if !isset self::typesMap[type] {

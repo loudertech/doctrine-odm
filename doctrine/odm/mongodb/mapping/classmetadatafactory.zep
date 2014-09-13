@@ -193,8 +193,11 @@ class ClassMetadataFactory extends AbstractClassMetadataFactory
      */
     protected function validateIdentifier(class1)
     {
+        var x;
+
         if  ! class1->identifier && ! class1->isMappedSuperclass && ! class1->isEmbeddedDocument {
-            //throw MappingException::identifierRequired(class1->name);
+            let x = "MappingException";
+            throw {x}::identifierRequired(class1->name);
         }
     }
 
@@ -257,21 +260,24 @@ class ClassMetadataFactory extends AbstractClassMetadataFactory
 
             case 5://ClassMetadata::GENERATOR_TYPE_CUSTOM:
                 if empty idGenOptions["class"] {
-                    //throw MappingException::missingIdGeneratorClass(class1->name);
+                    let x = "MappingException";
+                    throw {x}::missingIdGeneratorClass(class1->name);
                 }
 
                 let x = idGenOptions["class"];
                 let customGenerator = new {x}();
                 unset(idGenOptions["class"]);
                 if  ! (customGenerator instanceof \Doctrine\ODM\MongoDB\Id\AbstractIdGenerator) {
-                    //throw MappingException::classIsNotAValidGenerator(get_class(customGenerator));
+                    let x = "MappingException";
+                    throw {x}::classIsNotAValidGenerator(get_class(customGenerator));
                 }
 
                 let methods = get_class_methods(customGenerator);
                 for name, value in idGenOptions {
                     let method = "set" . ucfirst(name);
                     if  ! in_array(method, methods) {
-                        //throw MappingException::missingGeneratorSetter(get_class(customGenerator), name);
+                        let x = "MappingException";
+                        throw {x}::missingGeneratorSetter(get_class(customGenerator), name);
                     }
 
                     customGenerator->method(value);
@@ -281,7 +287,7 @@ class ClassMetadataFactory extends AbstractClassMetadataFactory
             case 6://ClassMetadata::GENERATOR_TYPE_NONE:
                 break;
             default:
-                //throw new MappingException("Unknown generator type: " . class1->generatorType);
+                throw new MappingException("Unknown generator type: " . class1->generatorType);
                 break;
         }
     }

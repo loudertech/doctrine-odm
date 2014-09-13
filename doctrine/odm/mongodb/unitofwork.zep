@@ -1969,10 +1969,11 @@ class UnitOfWork implements PropertyChangedListener
      */
     public function persist(document)
     {
-        var class1;
+        var class1, x;
         let class1 = this->dm->getClassMetadata(get_class(document));
         if class1->isMappedSuperclass {
-            //throw MongoDBException::cannotPersistMappedSuperclass(class1->name);
+            let x = "MongoDBException";
+            throw {x}::cannotPersistMappedSuperclass(class1->name);
         }
         this->doPersist(document, []);
     }
@@ -1992,7 +1993,7 @@ class UnitOfWork implements PropertyChangedListener
      */
     protected function doPersist(document, array visited)
     {
-        var oid, class1, documentState;
+        var oid, class1, documentState, x;
 
         let oid = spl_object_hash(document);
         if isset visited[oid] {
@@ -2030,7 +2031,8 @@ class UnitOfWork implements PropertyChangedListener
                     break;
                 }
             default:
-                //throw MongoDBException::invalidDocumentState(documentState);
+                let x = "MongoDBException";
+                throw {x}::invalidDocumentState(documentState);
                 break;
         }
 
@@ -2059,7 +2061,7 @@ class UnitOfWork implements PropertyChangedListener
      */
     protected function doRemove(document, array visited)
     {
-        var oid, class1, documentState;
+        var oid, class1, documentState, x;
 
         let oid = spl_object_hash(document);
         if isset visited[oid] {
@@ -2092,10 +2094,12 @@ class UnitOfWork implements PropertyChangedListener
                 this->cascadePreRemove(class1, document);
                 break;
             case self::STATE_DETACHED:
-                //throw MongoDBException::detachedDocumentCannotBeRemoved();
+                let x = "MongoDBException";
+                throw {x}::detachedDocumentCannotBeRemoved();
                 break;
             default:
-                //throw MongoDBException::invalidDocumentState(documentState);
+                let x = "MongoDBException";
+                throw {x}::invalidDocumentState(documentState);
                 break;
         }
     }
@@ -2200,7 +2204,7 @@ class UnitOfWork implements PropertyChangedListener
     {
         var oid, class1, managedCopy, id, prop, managedCopyVersion, documentVersion, name,
             assoc2, other, targetDocument, targetClass, relatedId, a, mergeCol, managedCol, 
-            assocField, prevClass;
+            assocField, prevClass, x;
 
         let oid = spl_object_hash(document);
 
@@ -2262,7 +2266,8 @@ class UnitOfWork implements PropertyChangedListener
 
                 // Throw exception if versions don"t match
                 if managedCopyVersion != documentVersion {
-                    //throw LockException::lockFailedVersionMissmatch(document, documentVersion, managedCopyVersion);
+                    let x = "LockException";
+                    throw {x}::lockFailedVersionMissmatch(document, documentVersion, managedCopyVersion);
                 }
             }
 
@@ -2719,7 +2724,7 @@ class UnitOfWork implements PropertyChangedListener
      */
     public function lock(document, lockMode, lockVersion = null)
     {
-        var documentName, class1, documentVersion;
+        var documentName, class1, documentVersion, x;
 
         if this->getDocumentState(document) != self::STATE_MANAGED {
             throw new \InvalidArgumentException("Document is not MANAGED.");
@@ -2731,13 +2736,15 @@ class UnitOfWork implements PropertyChangedListener
         //if lockMode == LockMode::OPTIMISTIC {
         if lockMode == 1  {
             if  ! class1->isVersioned {
-                //throw LockException::notVersioned(documentName);
+                let x = "LockException";
+                throw {x}::notVersioned(documentName);
             }
 
             if lockVersion != null {
                 let documentVersion = class1->reflFields[class1->versionField]->getValue(document);
                 if documentVersion != lockVersion {
-                    //throw LockException::lockFailedVersionMissmatch(document, lockVersion, documentVersion);
+                    let x = "LockException";
+                    throw {x}::lockFailedVersionMissmatch(document, lockVersion, documentVersion);
                 }
             }
         } else {
