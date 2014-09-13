@@ -212,7 +212,7 @@ class ClassMetadataFactory extends AbstractClassMetadataFactory
     private function completeIdGeneratorMapping(<ClassMetadataInfo> class1)
     {
         var idGenOptions, incrementGenerator, uuidGenerator, alnumGenerator, customGenerator, methods,
-            name, value, method;
+            name, value, method, x;
 
         let idGenOptions = class1->generatorOptions;
         switch class1->generatorType {
@@ -256,7 +256,8 @@ class ClassMetadataFactory extends AbstractClassMetadataFactory
                     //throw MappingException::missingIdGeneratorClass(class1->name);
                 }
 
-                let customGenerator = new idGenOptions["class"];
+                let x = idGenOptions["class"];
+                let customGenerator = new {x}();
                 unset(idGenOptions["class"]);
                 if  ! (customGenerator instanceof \Doctrine\ODM\MongoDB\Id\AbstractIdGenerator) {
                     //throw MappingException::classIsNotAValidGenerator(get_class(customGenerator));
