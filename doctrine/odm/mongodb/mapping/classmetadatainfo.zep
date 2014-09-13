@@ -1461,13 +1461,15 @@ class ClassMetadataInfo implements ClassMetadata
      */
     public function setFieldValue(document, field, value)
     {
-        if document instanceof \Doctrine\Common\Persistence\Proxy && !document->__isInitialized() {
+        /*if document instanceof Proxy && !document->__isInitialized() {
             //property changes to an uninitialized proxy will not be tracked or persisted,
             //so the proxy needs to be loaded first.
             document->__load();
         }
-        
+
         this->reflFields[field]->setValue(document, value);
+        */
+        throw new Exception("Esto no esta");
     }
 
     /**
@@ -1480,11 +1482,12 @@ class ClassMetadataInfo implements ClassMetadata
      */
     public function getFieldValue(document, field)
     {
-        if document instanceof Proxy && field !== this->identifier && ! document->__isInitialized() {
+        /*if document instanceof Proxy && field !== this->identifier && ! document->__isInitialized() {
             document->__load();
         }
         
-        return this->reflFields[field]->getValue(document);
+        return this->reflFields[field]->getValue(document);*/
+        throw new Exception("Esto no esta2");
     }
 
     /**

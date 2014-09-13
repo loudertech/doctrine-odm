@@ -126,7 +126,7 @@ class ClassMetadata extends ClassMetadataInfo
         ];
 
         // The rest of the metadata is only serialized if necessary.
-        if this->changeTrackingPolicy != ClassMetadataInfo::CHANGETRACKING_DEFERRED_IMPLICIT {
+        if this->changeTrackingPolicy != self::CHANGETRACKING_DEFERRED_IMPLICIT {
             let serialized[] = "changeTrackingPolicy";
         }
 
@@ -134,7 +134,7 @@ class ClassMetadata extends ClassMetadataInfo
             let serialized[] = "customRepositoryClassName";
         }
 
-        if this->inheritanceType != ClassMetadataInfo::INHERITANCE_TYPE_NONE {
+        if this->inheritanceType != self::INHERITANCE_TYPE_NONE {
             let serialized[] = "inheritanceType";
             let serialized[] = "discriminatorField";
             let serialized[] = "discriminatorValue";

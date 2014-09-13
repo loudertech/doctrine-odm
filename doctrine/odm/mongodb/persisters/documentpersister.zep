@@ -458,7 +458,7 @@ class DocumentPersister
         var cursor, result, lockMapping;
 
         // TODO: remove this
-        if criteria === null || is_scalar(criteria) || criteria instanceof \MongoId {
+        if criteria === null || is_scalar(criteria) || (criteria instanceof \MongoId) {
             let criteria = ["_id" : criteria];
         }
 
