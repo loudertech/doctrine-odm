@@ -52,6 +52,9 @@ abstract class Type
     const OBJECTID = "object_id";
     const RAW = "raw";
 
+
+    const MAPPINGEXCEPTION = "MappingException";
+
     /** 
     * Map of already instantiated type objects. One instance per type (flyweight). 
     */
@@ -60,10 +63,13 @@ abstract class Type
     /** 
     * The map of supported doctrine mapping typ
     */
-    private static typesMap = null;
+    protected static typesMap = null;
 
     /* Prevent instantiation and force use of the factory method. */
-    final protected function __construct() {
+    final protected function __construct() {}
+
+    public static function init() 
+    {
         if self::typesMap == null {
             let self::typesMap = [
                 "id" : "Doctrine\\ODM\\MongoDB\\Types\\IdType",
@@ -81,7 +87,7 @@ abstract class Type
                 "bin_bytearray" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataByteArrayType",
                 "bin_uuid" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataUUIDType",
                 "bin_md5" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataMD5Type",
-                "bin_custom" : "Doctrine\\ODM\MongoDB\\Types\\BinDataCustomType",
+                "bin_custom" : "Doctrine\\ODM\\MongoDB\\Types\\BinDataCustomType",
                 "file" : "Doctrine\\ODM\\MongoDB\\Types\\FileType",
                 "hash" : "Doctrine\\ODM\\MongoDB\\Types\\HashType",
                 "collection" : "Doctrine\\ODM\\MongoDB\\Types\\CollectionType",
@@ -147,13 +153,17 @@ abstract class Type
     public static function getType(type)
     {
         var className;
+        
+        if self::typesMap == null {
+            self::init();
+        }
 
         if !isset self::typesMap[type] {
-            //throw new \InvalidArgumentException(sprintf("Invalid type specified "%s".", type));
+            throw new \InvalidArgumentException(sprintf("Invalid type specified '%s'.", type));
         }
         if !isset self::typeObjects[type] {
             let className = self::typesMap[type];
-            let self::typeObjects[type] = new className;
+            let self::typeObjects[type] = new {className}();
         }
         return self::typeObjects[type];
     }
@@ -209,8 +219,10 @@ abstract class Type
      */
     public static function addType(name, className)
     {
+        var x;
         if isset self::typesMap[name] == true {
-            //throw MappingException::typeExists(name);
+            let x = MAPPINGEXCEPTION;
+            throw {x}::typeExists(name);
         }
 
         let self::typesMap[name] = className;
@@ -238,8 +250,10 @@ abstract class Type
      */
     public static function overrideType(name, className)
     {
+        var x;
         if ( ! isset(self::typesMap[name])) {
-            //throw MappingException::typeNotFound(name);
+            let x = MAPPINGEXCEPTION;
+            throw {x}::typeNotFound(name);
         }
 
         let self::typesMap[name] = className;

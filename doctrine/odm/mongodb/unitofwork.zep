@@ -384,7 +384,9 @@ class UnitOfWork implements PropertyChangedListener
     public function commit(document = null, array options = [])
     {
         var defaultOptions, object1, removal, commitOrder, class1, collectionToDelete,
-            collectionToUpdate, i, coll, x;
+            collectionToUpdate, coll, x;
+
+        int i;
 
         // Raise preFlush
         if this->evm->hasListeners("preFlush") {
